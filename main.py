@@ -5,6 +5,9 @@ import parser as AS
 while True:
     try:
         userInput = input("\nIngrese una operación simple: ")
+        if userInput == "":
+            print("Cadena vacía, ingrese una operación simple válida:")
+            continue
         Lexer = AL.LexicalAnalyzer(userInput)
         Lexer.generarTokens()
         tokens = Lexer.getListaTokens()
@@ -23,7 +26,7 @@ while True:
         print(e)
     except Exception as e:
         print("Expresión Inválida: ", e)
-    print("Desea ingresar otra operación? (s/n)")
+    print("Desea ingresar otra operación? (S/n)")
     wantToContinue = input()
     if wantToContinue == "n":
         break
