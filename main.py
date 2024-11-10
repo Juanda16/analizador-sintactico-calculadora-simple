@@ -1,4 +1,4 @@
-import lexical_analyzer as AL
+import lexer as AL
 import parser as AS
 
 
@@ -8,7 +8,7 @@ while True:
         if userInput == "":
             print("Cadena vacía, ingrese una operación simple válida:")
             continue
-        Lexer = AL.LexicalAnalyzer(userInput)
+        Lexer = AL.Lexer(userInput)
         Lexer.generarTokens()
         tokens = Lexer.getListaTokens()
 

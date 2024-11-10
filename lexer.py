@@ -3,7 +3,7 @@
 # Output: List of tokens (type, value)
 
 
-class LexicalAnalyzer:
+class Lexer:
     def __init__(self, cadena):
         self._cadena = cadena
         self._valorNumero = (

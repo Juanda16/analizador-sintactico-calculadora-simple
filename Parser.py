@@ -2,7 +2,7 @@
 
 # Entrada: Tokens con el tipo de token
 # Procesamiento: Intenta generar la lista de tokens usando las reglas gramaticales.
-# Cada regla de producción se implementa mediante un método en la clase AnalizadorSintactico
+# Cada regla de producción se implementa mediante un método en la clase Lexer
 # Salida: Validez sintáctica y el resultado de la operación
 
 # Reglas de producción
