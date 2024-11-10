@@ -1,92 +1,76 @@
-# Idea: TODO: Al realizar el Parseo(construir el árbol), es necesario que al evaluar se pueda extraer cuál es la operación a realizar
+# Analizador sintáctico descendente recursivo, que utiliza una gramática libre de contexto atribuida.
+
+# Entrada: Tokens con el tipo de token
+# Procesamiento: Intenta generar la lista de tokens usando las reglas gramaticales.
+# Cada regla de producción se implementa mediante un método en la clase AnalizadorSintactico
+# Salida: Validez sintáctica y el resultado de la operación
+
+# Reglas de producción
+# <expr> --> <term> | <term>+<expr> | <term>-<expr>
+# <term> --> <factor> | <factor>*<term> | <factor>/<term>
+# <factor> --> <num> | (<expr>)         <num> puede expresar cualquier número entero positivo.
 
 
-class Node:
-    def evaluate(self):
-        pass
-
-
-class BinOp(
-    Node
-):  # Nodo usado para representar expresiones y operaciones en el árbol sintáctico.
-    def __init__(self, left, op, right):
-        self.left = left
-        self.op = op
-        self.right = right
-
-    def evaluate(
-        self,
-    ):  # Retorna el valor de la operación de manera recursiva. En caso de que BinOp apunte a otro BinOp.
-        leftterm = self.left.evaluate()
-        rightterm = self.right.evaluate()
-        if self.op == "+":
-            return float(leftterm + rightterm)
-        elif self.op == "-":
-            return float(leftterm - rightterm)
-        elif self.op == "*":
-            return float(leftterm * rightterm)
-        elif self.op == "/":
-            return float(leftterm / rightterm)
-        # Recorre el arbol, o subarbol y se realiza las operaciones que representa.
-
-
-class Number(Node):  # Nodo sencillo con el valor numérico de un token
-    def __init__(self, value):
-        self.value = value
-
-    def evaluate(self):
-        return self.value
-
-
-class Parser:  # Construye un arbol sintáctico, la raiz es una operación. Árbol INORDEN
-    def __init__(self, tokens):
-        self.tokens = tokens
+class Parser:
+    def __init__(self, listaToken: list):
+        self._listaTokenEntrada = listaToken
         self.pos = 0
+        self._simboloInicial = "<expr>"
+
+    def getListaTokens(self):
+        return self._listaTokenEntrada
 
     def parse(self):
-        return self.parse_expression()
+        resultado = self.expr()
+        if self.pos != len(self.getListaTokens()):
+            raise ValueError("Expresión inválida")
+        else:
+            return resultado
 
-    def parse_expression(self):
-        left = self.parse_term()
-        while self.pos < len(self.tokens) and self.tokens[self.pos] in ["+", "-"]:
-            op = self.tokens[self.pos]  # Guarda el símbolo de la operación
-            self.pos += 1  # Avanza a el otro término de la operación.
-            right = self.parse_term()  # Lado derecho de la operación.
-            left = BinOp(
-                left, op, right
-            )  # Crea un nodo BinOp, con la info del lado izquierdo(ya parseado), la operación y el lado derecho(no parseado)
-        return left
+    def expr(
+        self,
+    ):  # Regla de producción "<expr>": ["<term>", "<term>+<expr>", "<term>-<expr>"]
+        result = self.term()
+        while self.pos < len(self.getListaTokens()):
+            if self.getListaTokens()[self.pos]["tipo"] == "OPERADOR_SUMA":
+                self.pos += 1
+                result += float(self.term())
+            elif self.getListaTokens()[self.pos]["tipo"] == "OPERADOR_RESTA":
+                self.pos += 1
+                result -= float(self.term())
+            else:
+                break
+        return result
 
-    def parse_term(self):
-        left = self.parse_factor()
-        while self.pos < len(self.tokens) and self.tokens[self.pos] in ["*", "/"]:
-            op = self.tokens[self.pos]
+    def term(
+        self,
+    ):  # Regla de producción  "<term>": ["<factor>", "<factor>*<term>", "<factor>/<term>"]
+        result = self.factor()
+        while self.pos < len(self.getListaTokens()):
+            if self.getListaTokens()[self.pos]["tipo"] == "OPERADOR_MULTIPLICACION":
+                self.pos += 1
+                result *= float(self.factor())
+            elif self.getListaTokens()[self.pos]["tipo"] == "OPERADOR_DIVISION":
+                self.pos += 1
+                result /= float(self.factor())
+            else:
+                break
+        return result
+
+    def factor(self):  # Regla de producción "<factor>": ["<num>", "(<expr>)"],
+        if self.getListaTokens()[self.pos]["tipo"] == "PARENTESIS_IZQUIERDO":
             self.pos += 1
-            right = self.parse_factor()
-            left = BinOp(left, op, right)
-        return left
-
-    def parse_factor(self):  # Para los factores que componen un término
-        if (
-            self.tokens[self.pos] == "("
-        ):  # Disminuye la ambiguedad agrupando con paréntesis
+            result = self.expr()
+            if self.getListaTokens()[self.pos]["tipo"] == "PARENTESIS_DERECHO":
+                self.pos += 1
+                return result
+            else:
+                raise ValueError("Se esperaba )")
+        elif (
+            self.getListaTokens()[self.pos]["tipo"] == "INTEGER"
+        ):  # Cuando el token representa un numero
+            result = float(self.getListaTokens()[self.pos]["valor"])
             self.pos += 1
-            node = (
-                self.parse_expression()
-            )  # Parsea la expresión al interior del paréntesis. Y guarda la referencia al subárbol que la representa
-            self.pos += 1
-            return node
-        else:  # Si no hay paréntesis
-            node = Number(
-                float(self.tokens[self.pos])
-            )  # Crea un nodo Number con la información del número que representa el token
-            self.pos += 1
-            return node
-
-
-tokens = ["(", "3", "+", "10", "-", "9", ")", "*", "(", "7", "-", "3", ")"]
-parser = Parser(tokens)
-tree = parser.parse()
-print(tree.evaluate())  # Resultado de la operación
-
-# Imprime 35
+            return result
+        else:
+            raise ValueError("Se esperaba un numero entero positivo")

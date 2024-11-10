@@ -1,9 +1,9 @@
-# Entrada Ej: 8+7*3
-# Procesamiento: Recorre la entrada de la calculadora y construye la lista de tokens dependiendo del caracter que lea.
-# Salida: Lista de tokens (tipo, valor)
+# Input e.g: 8+7*3
+# Processing: It goes through the calculator input and builds the list of tokens depending on the character it reads.
+# Output: List of tokens (type, value)
 
 
-class AnalizadorLexico:
+class LexicalAnalyzer:
     def __init__(self, cadena):
         self._cadena = cadena
         self._valorNumero = (
