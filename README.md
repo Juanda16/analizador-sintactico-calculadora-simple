@@ -1,15 +1,16 @@
 # Practica7 - TeoriaDeLenguajes
 
-##Integrantes:
+# Integrantes:
+  -  Laura Tobón
+  -  Juan David Arismendy
 
-##Laura Tobón
-##Juan David Arismendy
+## Laboratorio 7 - Parte 2.
 
 Elaborar un analizador sintáctico que responda a la sintaxis de una calculadora simple. Además de admitir los tokens correctos, presentará también el resultado de la operación. Cuando ocurra un error de sintaxis deberá indicar cuál es el error.
 
 Lenguajes: C, C++, C#, Javascript, Java, Kotlin o Python.
 
-#Informe
+## Informe
 
 1. Introducción
 
